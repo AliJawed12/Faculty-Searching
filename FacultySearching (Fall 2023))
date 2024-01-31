@@ -1,0 +1,321 @@
+// Ali Jawed
+// Program to search faculty data
+
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Arrays;
+import javax.swing.JOptionPane;
+
+public class FacultySearching {
+
+    public static void main(String[] args) throws IOException {
+
+
+        // All code for File input and data storage
+        String facultyFile = "/Users/Jawed/OneDrive/Desktop/faculty.txt";
+        String facultyReviewFile = "/Users/Jawed/OneDrive/Desktop/facultyReviewData.txt";
+
+        // Code to read the faculty file and populate its designated arrays
+        int count = 0;
+        try (BufferedReader countReader = new BufferedReader(new FileReader(facultyFile))) {
+            while (countReader.readLine() != null) {
+                count++;
+            }
+        }
+        // Initalizing Arrays with length of file
+        int[] facultyID = new int[count];
+        String[] facultyName = new String[count];
+        String[] facultyEmail = new String[count];
+        String[] lines = new String[count];
+        //String[] splitLine = new String[2];
+
+        BufferedReader readFile = new BufferedReader(new FileReader(facultyFile));
+
+        int index = 0;
+        String line = "";
+
+        while ((line = readFile.readLine()) != null) {
+            String[] splitLine = line.split(" ");
+            facultyID[index] = Integer.parseInt(splitLine[0]);
+            facultyName[index] = splitLine[1].replace("_", " ");
+            facultyEmail[index] = splitLine[2];
+            index++;
+
+        }
+
+
+
+
+        // Code To Read Review File and Populate its designated arrays
+        int reviewCount = 0;
+        try (BufferedReader reviewFileRead = new BufferedReader(new FileReader(facultyReviewFile))) {
+            while (reviewFileRead.readLine() != null) {
+                reviewCount++;
+            }
+        }
+
+        // Initializing array with length of file
+        double[][] surveyResponses = new double[reviewCount][]; //
+
+        BufferedReader reviewFileRead = new BufferedReader(new FileReader(facultyReviewFile));
+
+        int reviewIndex = 0;
+        String reviewLine = "";
+
+
+        while ((reviewLine = reviewFileRead.readLine()) != null) {
+            String[] reviewLineSplit = reviewLine.split(",");
+
+            surveyResponses[reviewIndex] = new double[reviewLineSplit.length];
+
+            for (int i = 0; i < reviewLineSplit.length; i++) {
+                surveyResponses[reviewIndex][i] = Double.parseDouble(reviewLineSplit[i]);     //
+            }
+
+
+            reviewIndex++;
+        }
+
+
+
+
+        // Done with all storing of data
+        // Coding for actual program starts here
+
+        int chosenOption;
+
+        chosenOption = menu();
+
+        if (chosenOption == 1){
+            idSearch(facultyID, facultyName, facultyEmail, surveyResponses);
+        }
+        else if (chosenOption == 2){
+            lastNameSearch(facultyID, facultyName, facultyEmail, surveyResponses);
+        }
+        else if (chosenOption == 3) {
+            firstNameSearch (facultyID, facultyName, facultyEmail, surveyResponses);
+        }
+        else if (chosenOption == 4) {
+            searchByQuestion(facultyID, facultyName, facultyEmail, surveyResponses);
+        }
+        else if (chosenOption == 5) {
+            allAverages(surveyResponses);
+        }
+
+
+
+
+    }
+
+    public static int menu () {
+
+        int selectedOption = 0;
+        String optionMenu = "Select an Option by Entering The Number of the Option\n";
+        optionMenu += "1. Search by Faculty ID\n";
+        optionMenu += "2. Search by Last Name\n";
+        optionMenu += "3. Search by First Name\n"; // My Query
+        optionMenu += "4. Search by Question\n";
+        optionMenu += "5. Get all Question Averages\n";
+
+        while (! (selectedOption == 1 || selectedOption == 2 || selectedOption == 3 || selectedOption == 4 ||
+                selectedOption == 5)) {
+            selectedOption = Integer.parseInt(JOptionPane.showInputDialog(optionMenu));
+        }
+        return selectedOption;
+
+    }
+
+
+    // Getting info with id
+    public static void idSearch (int[] idIn, String[] nameIn, String[] emailIn, double[][] surveysIn) {
+        int idComp;
+        int getIndex = 0;
+        int id = 0;
+        String name = "";
+        String email = "";
+        double survey1 = 0, survey2 = 0, survey3 = 0, survey4 = 0;
+
+        idComp = Integer.parseInt(JOptionPane.showInputDialog("Enter Employee ID"));
+
+        for (int i = 0; i < idIn.length; i++){
+            if (idComp == idIn[i]){
+                getIndex = i;
+            }
+        }
+
+        int avgCounter = 0;
+        for (int i = 0; i < surveysIn.length; i++){
+            if (idComp == surveysIn[i][0]){
+                survey1 += surveysIn[i][1];
+                survey2 += surveysIn[i][2];
+                survey3 += surveysIn[i][3];
+                survey4 += surveysIn[i][4];
+                avgCounter++;
+                //System.out.println(surveysIn[i][2]);
+            }
+        }
+
+        id = idIn[getIndex];
+        name = nameIn[getIndex];
+        email = emailIn[getIndex];
+
+        String finalMessage = "null";
+
+        finalMessage = "Faculty Information: \n";
+        finalMessage += "ID: " + id + "\n";
+        finalMessage += "Email: " + email + "\n";
+        finalMessage += "Survey 1: " + String.format("%.1f", survey1 / avgCounter) + "\n";
+        finalMessage += "Survey 2: " + String.format("%.1f", survey2 / avgCounter) + "\n";
+        finalMessage += "Survey 3: " + String.format("%.1f", survey3 / avgCounter) + "\n";
+        finalMessage += "Survey 4: " + String.format("%.1f", survey4 / avgCounter) + "\n";
+        JOptionPane.showMessageDialog(null, finalMessage);
+
+    }
+
+    // Getting info with last name
+    public static void lastNameSearch (int[] idIn, String[] nameIn, String[] emailIn, double[][] surveysIn) {
+        String lastName;
+        String name;
+        String email;
+        int id;
+        int indexOfName = -1;
+        double survey1 = 0, survey2 = 0, survey3 = 0, survey4 = 0;
+
+        lastName = JOptionPane.showInputDialog("Enter Last Name to Search");
+
+        for (int i = 0; i < nameIn.length; i++){
+            String fullName = nameIn[i];
+            String last = fullName.split(" ")[1];
+            if (lastName.equals(last)){
+                indexOfName = i;
+            }
+
+        }
+
+        name = nameIn[indexOfName];
+        id = idIn[indexOfName];
+        email = emailIn[indexOfName];
+
+
+        int avgCounter = 0;
+        for (int i = 0; i < surveysIn.length; i++){
+            if (id == surveysIn[i][0]){
+                survey1 += surveysIn[i][1];
+                survey2 += surveysIn[i][2];
+                survey3 += surveysIn[i][3];
+                survey4 += surveysIn[i][4];
+                avgCounter++;
+                //System.out.println(surveysIn[i][2]);
+            }
+        }
+
+
+        // Final Message Initalization and Formating
+        String finalMessage = null;
+
+        finalMessage = "Faculty Information: \n";
+        finalMessage += "ID: " + id + "\n";
+        finalMessage += "Name: " + name + "\n";
+        finalMessage += "Email: " + email + "\n";
+        finalMessage += "Survey 1: " + String.format("%.1f", survey1 / avgCounter) + "\n";
+        finalMessage += "Survey 2: " + String.format("%.1f", survey2 / avgCounter) + "\n";
+        finalMessage += "Survey 3: " + String.format("%.1f", survey3 / avgCounter) + "\n";
+        finalMessage += "Survey 4: " + String.format("%.1f", survey4 / avgCounter) + "\n";
+        JOptionPane.showMessageDialog(null, finalMessage);
+
+    }
+
+    public static void searchByQuestion (int[] idIn, String[] nameIn, String[] emailIn, double[][] surveysIn) {
+        int questionNum = 0;
+
+        questionNum = Integer.parseInt(JOptionPane.showInputDialog("Enter the Question number between 1-4"));
+
+    }
+
+
+    // Method to get faculty info by first name
+    // This is my personal query
+    public static void firstNameSearch (int[] idIn, String[] nameIn, String[] emailIn, double[][] surveysIn) {
+        String firstName;
+        String name;
+        String email;
+        int id;
+        int indexOfName = -1;
+        double survey1 = 0, survey2 = 0, survey3 = 0, survey4 = 0;
+
+        firstName = JOptionPane.showInputDialog("Enter first Name to Search");
+
+        for (int i = 0; i < nameIn.length; i++){
+            String fullName = nameIn[i];
+            String last = fullName.split(" ")[0];
+            if (firstName.equals(last)){
+                indexOfName = i;
+            }
+
+        }
+
+        name = nameIn[indexOfName];
+        id = idIn[indexOfName];
+        email = emailIn[indexOfName];
+
+
+        int avgCounter = 0;
+        for (int i = 0; i < surveysIn.length; i++){
+            if (id == surveysIn[i][0]){
+                survey1 += surveysIn[i][1];
+                survey2 += surveysIn[i][2];
+                survey3 += surveysIn[i][3];
+                survey4 += surveysIn[i][4];
+                avgCounter++;
+                //System.out.println(surveysIn[i][2]);
+            }
+        }
+
+
+        // Final Message Initalization and Formating
+        String finalMessage = null;
+
+        finalMessage = "Faculty Information: \n";
+        finalMessage += "ID: " + id + "\n";
+        finalMessage += "Name: " + name + "\n";
+        finalMessage += "Email: " + email + "\n";
+        finalMessage += "Survey 1: " + String.format("%.1f", survey1 / avgCounter) + "\n";
+        finalMessage += "Survey 2: " + String.format("%.1f", survey2 / avgCounter) + "\n";
+        finalMessage += "Survey 3: " + String.format("%.1f", survey3 / avgCounter) + "\n";
+        finalMessage += "Survey 4: " + String.format("%.1f", survey4 / avgCounter) + "\n";
+        JOptionPane.showMessageDialog(null, finalMessage);
+
+    }
+
+    // Function to get all averages
+    public static void allAverages (double[][] surveysIn) {
+        double survey1 = 0, survey2 = 0, survey3 = 0, survey4 = 0;
+
+        int avgCounter = 0;
+        for (int i = 0; i < surveysIn.length; i++){
+            survey1 += surveysIn[i][1];
+            survey2 += surveysIn[i][2];
+            survey3 += surveysIn[i][3];
+            survey4 += surveysIn[i][4];
+
+            avgCounter++;
+        }
+
+        String finalMessage = "";
+        finalMessage = "All Question Averages\n";
+        finalMessage += "Survey 1: " + String.format("%.1f", survey1 / avgCounter) + "\n";
+        finalMessage += "Survey 2: " + String.format("%.1f", survey2 / avgCounter) + "\n";
+        finalMessage += "Survey 3: " + String.format("%.1f", survey3 / avgCounter) + "\n";
+        finalMessage += "Survey 4: " + String.format("%.1f", survey4 / avgCounter) + "\n";
+        JOptionPane.showMessageDialog(null, finalMessage);
+
+
+    }
+
+
+}
+
+
