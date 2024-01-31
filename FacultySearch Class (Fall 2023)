@@ -1,0 +1,80 @@
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Arrays;
+
+import static java.lang.Float.parseFloat;
+
+public class FacultySearch {
+    private String[] facultyID;
+    private String[] facultyNames;
+    private String[] facultyEmails;
+    private float[][] surveyResponse;
+
+    public FacultySearch() {
+        facultyID = new String[0];
+        facultyNames = new String[0];
+        facultyEmails = new String[0];
+        surveyResponse = new float[0][4];
+
+    }
+
+    public FacultySearch(String[] facultyIDIn, String[] facultyNamesIn, String[] facultyEmailsIn,
+                         float[][] surveyResponseIn) {
+        this.facultyID = facultyIDIn;
+        this.facultyNames = facultyEmailsIn;
+        this.facultyEmails = facultyEmailsIn;
+        this.surveyResponse = surveyResponseIn;
+
+    }
+
+    public void readFacultyReviewFile (String facultyReviewFileIn) {
+        String line = "";
+        try {
+            BufferedReader reviewFile = new BufferedReader(new FileReader(facultyReviewFileIn));
+
+            while ((line = reviewFile.readLine()) != null) {
+                System.out.println(line);
+                break;
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void readFacultyFile (String facultyFileIn) {
+        try {
+            BufferedReader facultyFile = new BufferedReader(new FileReader(facultyFileIn));
+
+
+            String[] lines = facultyFileIn.split("\n");
+
+            facultyID = new String[lines.length];
+            facultyNames = new String[lines.length];
+            facultyEmails = new String[lines.length];
+
+            for (int i = 0; i < lines.length; i++){
+                String[] parts = lines[i].split(" ");
+                facultyID[i] = (parts[0]);
+                facultyNames[i] = parts[1];
+                facultyEmails[i] = parts[2];
+            }
+
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
